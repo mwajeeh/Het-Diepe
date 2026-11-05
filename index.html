@@ -1212,8 +1212,9 @@ function renderDashboard() {
             h("strong", null, `${e.score}/40`),
             h("span", { class: "muted small" }, fmtDate(e.submittedAt)),
             h("span", { class: "spacer", style: "flex:1" }),
-            h("button", { class: "btn small", type: "button", onclick: () => go("results", { examIndex: i }) }, "Uitslag"),
-            h("button", { class: "btn small ghost", type: "button", onclick: () => { ui.reviewFilter = "alles"; go("review", { examIndex: i }); } }, "Nakijken"));
+            h("span", { class: "btn-row", style: "gap:6px" },
+              h("button", { class: "btn small", type: "button", onclick: () => go("results", { examIndex: i }) }, "Uitslag"),
+              h("button", { class: "btn small ghost", type: "button", onclick: () => { ui.reviewFilter = "alles"; go("review", { examIndex: i }); } }, "Nakijken")));
         })),
       ]);
 

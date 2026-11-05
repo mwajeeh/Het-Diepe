@@ -1021,7 +1021,7 @@ function historyChart(exams) {
   const markup = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Examenscores over tijd; slaaggrens 29">
     ${grid}
     <line x1="${L}" x2="${W - R}" y1="${y(PASS_MARK)}" y2="${y(PASS_MARK)}" style="stroke:var(--ok)" stroke-width="2" stroke-dasharray="6 5"/>
-    <text x="${W - R}" y="${y(PASS_MARK) - 6}" text-anchor="end">geslaagd bij 29</text>
+    <text x="${L + 6}" y="${y(PASS_MARK) - 6}">geslaagd bij 29</text>
     <path d="${line}" fill="none" style="stroke:var(--deep)" stroke-width="2.5" stroke-linejoin="round"/>
     ${dots}
     <text x="${L}" y="${H - 6}">${pts.length > 1 ? "oudste" : ""}</text>

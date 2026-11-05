@@ -1085,11 +1085,75 @@ let timerHandle = null;
 let practice = null; // transient practice session
 let notice = null; // one-off message for the next screen
 
-function go(name, extra) {
+// ----- routing: every screen gets a #hash so the browser/phone back button works.
+// Hash changes need no server support, so this works on file:// and on GitHub Pages.
+const ROUTES = {
+  dashboard: "", examIntro: "examen", resume: "examen/open", exam: "examen/bezig",
+  results: "uitslag", review: "nakijken", practiceSetup: "oefenen", practice: "oefenen/ronde",
+  progress: "voortgang", settings: "instellingen",
+};
+const normHash = (x) => (x || "").replace(/^#/, "");
+function hashFor(name, extra) {
+  let r = ROUTES[name] ?? "";
+  if ((name === "results" || name === "review") && extra && Number.isInteger(extra.examIndex)) r += "/" + extra.examIndex;
+  return r;
+}
+function parseHash(hash) {
+  const r = normHash(hash);
+  const m = /^(uitslag|nakijken)\/(\d+)$/.exec(r);
+  if (m) return { name: m[1] === "uitslag" ? "results" : "review", examIndex: Number(m[2]) };
+  const name = Object.keys(ROUTES).find((k) => ROUTES[k] === r);
+  return { name: name || "dashboard" };
+}
+let ignoreHash = null; // hash we set ourselves; its hashchange event is not a user navigation
+function setHash(route, replace) {
+  if (normHash(location.hash) === route) return;
+  ignoreHash = route;
+  try {
+    if (replace) location.replace("#" + route);
+    else location.hash = route;
+  } catch (e) { ignoreHash = null; }
+}
+
+// opts.replace: replace the current history entry instead of adding one
+// opts.fromHistory: called from a back/forward navigation; the URL is already right
+function go(name, extra, opts = {}) {
   view = { name, ...(extra || {}) };
+  if (!opts.fromHistory) setHash(hashFor(name, view), !!opts.replace);
   render();
   window.scrollTo(0, 0);
 }
+
+// Decide which screen a (possibly stale) route may show right now.
+function resolveRoute(target) {
+  if (target.name === "exam" || target.name === "resume") return state.inProgress ? { name: "resume" } : { name: "dashboard" };
+  if (target.name === "practice" && !practice) return { name: "practiceSetup" };
+  if ((target.name === "results" || target.name === "review") && !state.exams[target.examIndex]) return { name: "dashboard" };
+  return target;
+}
+
+window.addEventListener("hashchange", () => {
+  const cur = normHash(location.hash);
+  if (ignoreHash !== null && cur === ignoreHash) { ignoreHash = null; return; }
+  ignoreHash = null;
+  // Back while a dialog is open: just close the dialog and stay.
+  const dlg = document.querySelector("dialog[open]");
+  if (dlg) {
+    dlg.dispatchEvent(new Event("cancel", { cancelable: true }));
+    setHash(hashFor(view.name, view), false);
+    return;
+  }
+  // Back during an exam: never leave silently; ask whether to abandon.
+  if (view.name === "exam" && state.inProgress) {
+    setHash(hashFor("exam"), false);
+    abandonFlow();
+    return;
+  }
+  const target = parseHash(cur);
+  const next = resolveRoute(target);
+  const redirected = next.name !== target.name;
+  go(next.name, next, redirected ? { replace: true } : { fromHistory: true });
+});
 
 function renderBanner() {
   const slot = document.getElementById("banner-slot");
@@ -1260,7 +1324,7 @@ function startExam() {
   exam.warned5 = false;
   exam.warned1 = false;
   commit({ ...state, inProgress: exam });
-  go("exam");
+  go("exam", null, { replace: true });
 }
 
 function renderResume() {
@@ -1276,7 +1340,7 @@ function renderResume() {
         ex.timed ? ` Resterende tijd: ${formatDuration(left)}.` : " Zonder tijdsdruk."),
       h("p", { class: "muted small" }, "Afbreken gooit dit examen weg; het telt dan nergens mee."),
       h("div", { class: "btn-row" },
-        h("button", { class: "btn primary", type: "button", onclick: () => go("exam") }, "Doorgaan"),
+        h("button", { class: "btn primary", type: "button", onclick: () => go("exam", null, { replace: true }) }, "Doorgaan"),
         h("button", { class: "btn danger", type: "button", onclick: abandonFlow }, "Afbreken"))));
 }
 
@@ -1284,7 +1348,7 @@ async function abandonFlow() {
   const ok = await confirmDialog("Examen afbreken?", "Dit examen wordt weggegooid en telt nergens mee: niet in je score, niet in je dekking.", "Afbreken", true);
   if (!ok) return;
   commit(abandonExam(state));
-  go("dashboard");
+  go("dashboard", null, { replace: view.name === "exam" || view.name === "resume" });
 }
 
 // ===================================================================== exam: question screen
@@ -1397,7 +1461,7 @@ async function submitFlow() {
 function finishExam(auto) {
   commit(submitExam(BANK, state, Date.now(), auto));
   if (auto) notice = "De tijd was om. Je examen is automatisch ingeleverd met de antwoorden die je had gegeven.";
-  go("results", { examIndex: state.exams.length - 1, fresh: true });
+  go("results", { examIndex: state.exams.length - 1, fresh: true }, { replace: true });
 }
 
 // ----- timer
@@ -1849,20 +1913,21 @@ function boot() {
     if (unknown || !Array.isArray(ex.answers)) {
       commit(abandonExam(state));
       notice = null;
-      go("dashboard");
+      go("dashboard", null, { replace: true });
       infoDialog("Open examen vervallen", "De vragenbank is bijgewerkt sinds je dit examen startte. Het open examen is daarom vervallen en telt nergens mee.");
       return;
     }
     if (ex.timed && timeLeftMs(ex) <= 0) {
       commit(submitExam(BANK, state, Date.now(), true));
       notice = "Je had nog een examen open, maar de tijd was al om. Het is automatisch ingeleverd met de antwoorden die je had gegeven.";
-      go("results", { examIndex: state.exams.length - 1, fresh: true });
+      go("results", { examIndex: state.exams.length - 1, fresh: true }, { replace: true });
       return;
     }
-    go("resume");
+    go("resume", null, { replace: true });
     return;
   }
-  go("dashboard");
+  const next = resolveRoute(parseHash(location.hash));
+  go(next.name, next, { replace: true });
 }
 boot();
 </script>

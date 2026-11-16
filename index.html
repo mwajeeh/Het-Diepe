@@ -350,7 +350,11 @@ dialog .dlg-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content
 @keyframes bob { 50% { transform: translateY(-3px) rotate(-4deg); } }
 /* Woordhulp: underlined glossary words and the explanation panel under a question */
 .term { text-decoration: underline dotted var(--accent); text-decoration-thickness: 2px; text-underline-offset: 0.22em; cursor: help; }
-.option .term { cursor: inherit; }
+.term-pop { position: absolute; z-index: 50; width: min(340px, calc(100vw - 24px)); background: var(--surface); color: var(--text); border: 1px solid var(--accent); border-radius: 12px; box-shadow: var(--shadow); padding: 10px 12px 8px; }
+.term-pop p { margin: 4px 0 6px; }
+.tp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tp-close { min-width: 36px; min-height: 36px; margin: -6px -6px -6px 0; border: 0; background: none; color: var(--muted); font-size: 1.4rem; line-height: 1; cursor: pointer; border-radius: 999px; }
+.tp-close:hover { background: var(--surface-2); }
 details.wordhelp { margin-top: 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); }
 details.wordhelp > summary { list-style: none; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 14px; cursor: pointer; font-weight: 700; }
 details.wordhelp > summary::-webkit-details-marker { display: none; }
@@ -1321,6 +1325,7 @@ function page(...content) {
 
 function render() {
   stopTimer();
+  closeTermPop();
   const app = document.getElementById("app");
   app.innerHTML = "";
   let nodes;
@@ -1393,21 +1398,45 @@ function wordHelpPanel(texts, { open, onToggle, inExam } = {}) {
       hidden === 1 ? "1 woord dat je al kent, is verborgen." : `${hidden} woorden die je al kent, zijn verborgen.`,
       inExam ? null : [" ", h("button", { class: "linklike", type: "button", onclick: () => go("glossary") }, "Woordenlijst")]) : null);
 }
-// Tapping an underlined word (outside an answer button) opens the panel at that word.
+// Tapping an underlined word shows its explanation in a small bubble next to the word.
+// This runs in the capture phase and stops the click, so tapping a word inside an answer
+// shows the explanation and does NOT choose that answer.
+let termPop = null;
+function closeTermPop() {
+  if (termPop) { termPop.remove(); termPop = null; }
+}
+function openTermPop(termEl) {
+  closeTermPop();
+  const e = GMAP.get(termEl.dataset.term);
+  if (!e) return;
+  termPop = h("div", { class: "term-pop", role: "dialog", "aria-label": `Uitleg: ${e.term}` },
+    h("div", { class: "tp-head" },
+      h("strong", null, e.term),
+      h("button", { class: "tp-close", type: "button", "aria-label": "Sluiten", onclick: closeTermPop }, "×")),
+    h("p", null, e.uitleg),
+    h("button", { class: "btn ghost small", type: "button", onclick: () => { closeTermPop(); knowTerm(e.id); } }, "Ken ik"));
+  document.body.append(termPop);
+  const r = termEl.getBoundingClientRect();
+  const vw = document.documentElement.clientWidth;
+  const w = termPop.offsetWidth;
+  const ph = termPop.offsetHeight;
+  const left = Math.min(Math.max(12, r.left + r.width / 2 - w / 2), vw - w - 12);
+  const below = r.bottom + 8 + ph <= window.innerHeight || r.top - 8 - ph < 0;
+  termPop.style.left = `${left + window.scrollX}px`;
+  termPop.style.top = `${(below ? r.bottom + 8 : r.top - 8 - ph) + window.scrollY}px`;
+  announce(`${e.term}: ${e.uitleg}`);
+}
 document.addEventListener("click", (ev) => {
   const t = ev.target && ev.target.closest ? ev.target.closest(".term") : null;
-  if (!t || t.closest("button")) return;
-  const scope = t.closest(".qpanel, .review-item");
-  const panel = scope && scope.querySelector("details.wordhelp");
-  if (!panel) return;
-  panel.open = true;
-  const item = [...panel.querySelectorAll(".wh-item")].find((x) => x.dataset.term === t.dataset.term);
-  if (!item) return;
-  item.classList.remove("flash");
-  void item.offsetWidth; // restart the animation
-  item.classList.add("flash");
-  item.scrollIntoView({ block: "nearest", behavior: reducedMotion() ? "auto" : "smooth" });
-});
+  if (t) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    openTermPop(t);
+    return;
+  }
+  if (termPop && !termPop.contains(ev.target)) closeTermPop();
+}, true);
+window.addEventListener("resize", closeTermPop);
 
 // ===================================================================== dashboard
 function renderDashboard() {
@@ -2140,6 +2169,7 @@ async function resetFlow() {
 // ===================================================================== keyboard
 document.addEventListener("keydown", (ev) => {
   if (ev.defaultPrevented || ev.altKey || ev.ctrlKey || ev.metaKey) return;
+  if (ev.key === "Escape" && termPop) { ev.preventDefault(); closeTermPop(); return; }
   if (document.querySelector("dialog[open]")) return;
   const tag = (ev.target && ev.target.tagName) || "";
   if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;

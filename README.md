@@ -1,7 +1,8 @@
 # Het Diepe
 
 Oefenbad voor de examinatortoets Zwem-ABC: a self-contained practice app (`index.html`) with a practice exam
-(40 vragen, 40 minuten, geslaagd bij 29) and topic practice with instant feedback.
+(40 vragen, 40 minuten, geslaagd bij 29) and topic practice with instant feedback. A word list (Woordenlijst) explains
+hard words from the questions in simple Dutch.
 
 Onofficieel oefenmateriaal voor eigen gebruik — niet van of goedgekeurd door de Nationale Raad Zwemveiligheid.
 Bron: Examenregeling Nationale Zwemdiploma's, versie maart 2018.

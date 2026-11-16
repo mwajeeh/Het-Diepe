@@ -284,7 +284,8 @@ input[type="number"], select { font: inherit; min-height: 44px; padding: 6px 10p
 .option.correct .letter { background: var(--ok); border-color: var(--ok); color: var(--surface); }
 .option.wrong { border-color: var(--bad); background: var(--bad-soft); }
 .option.wrong .letter { background: var(--bad); border-color: var(--bad); color: var(--surface); }
-.option[disabled] { cursor: default; }
+.option[disabled], .option[aria-disabled="true"] { cursor: default; }
+.option[aria-disabled="true"]:not(.correct):not(.wrong):hover { border-color: var(--border); }
 .exam-nav { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; align-items: center; }
 .exam-nav .spacer { flex: 1; }
 .flag-btn[aria-pressed="true"] { border-color: var(--flag); color: var(--flag); background: var(--warn-soft); }
@@ -349,7 +350,15 @@ dialog .dlg-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content
 .bob { animation: bob 3s ease-in-out infinite; transform-origin: center; }
 @keyframes bob { 50% { transform: translateY(-3px) rotate(-4deg); } }
 /* Woordhulp: underlined glossary words and the explanation panel under a question */
-.term { text-decoration: underline dotted var(--accent); text-decoration-thickness: 2px; text-underline-offset: 0.22em; cursor: help; }
+/* longhands (plus -webkit-): Safari/WebKit ignores the "underline dotted <color>" shorthand */
+.term {
+  position: relative; cursor: help; -webkit-tap-highlight-color: transparent;
+  -webkit-text-decoration-line: underline; -webkit-text-decoration-style: dotted; -webkit-text-decoration-color: var(--accent);
+  text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px; text-underline-offset: 0.22em;
+}
+/* invisible margin around the word, so a slightly-off tap still counts as tapping the word */
+.term::after { content: ""; position: absolute; inset: -7px -5px; }
 .term-pop { position: absolute; z-index: 50; width: min(340px, calc(100vw - 24px)); background: var(--surface); color: var(--text); border: 1px solid var(--accent); border-radius: 12px; box-shadow: var(--shadow); padding: 10px 12px 8px; }
 .term-pop p { margin: 4px 0 6px; }
 .tp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -1878,7 +1887,7 @@ async function startPractice(scope, n, label) {
     await infoDialog("Geen vragen gevonden", scope.kind === "wrong" ? "Je hebt (nog) niets fout beantwoord. Lekker bezig." : "In deze selectie zitten (nu) geen vragen.");
     return;
   }
-  practice = { ...set, label, i: 0, chosen: null, correct: 0, done: 0 };
+  practice = { ...set, label, i: 0, chosen: null, pending: null, correct: 0, done: 0 };
   go("practice");
 }
 
@@ -1918,11 +1927,15 @@ function renderPractice() {
     h("section", { class: "qpanel" },
       h("div", { class: "qnum" }, `Vraag ${p.i + 1} van ${p.questionIds.length}`, h("span", { class: "pill" }, categoryLabel(q.category))),
       h("p", { class: "qtext", id: "qtext", tabindex: "-1" }, stem),
+      // Two steps: tapping an answer only selects it (changeable), "Controleer" checks it.
+      // After checking, the answers are aria-disabled rather than disabled, so the
+      // underlined words inside them stay tappable.
       h("div", { class: "options", role: answered ? "group" : "radiogroup", "aria-labelledby": "qtext" },
         order.map((orig, pos) => h("button", {
           class: "option" + (answered && orig === q.answer ? " correct" : "") + (answered && orig === p.chosen && orig !== q.answer ? " wrong" : ""),
-          type: "button", role: answered ? null : "radio", "aria-checked": answered ? null : "false", disabled: answered,
-          onclick: () => answerPractice(orig),
+          type: "button", role: answered ? null : "radio", "aria-checked": answered ? null : String(p.pending === orig),
+          "aria-disabled": answered ? "true" : null,
+          onclick: () => selectPractice(orig),
         }, h("span", { class: "letter" }, LETTERS[pos]), h("span", null, optionNodes[pos])))),
       answered ? h("div", { class: "feedback " + (isRight ? "ok" : "bad") },
         h("div", { class: "verdict" }, isRight ? "Goed!" : `Helaas. Het juiste antwoord is ${LETTERS[correctPos]}.`),
@@ -1930,14 +1943,28 @@ function renderPractice() {
         h("div", { class: "ref" }, q.ref),
         sourceBlock(q)) : null,
       h("div", { class: "exam-nav" },
-        answered ? h("button", { class: "btn primary", type: "button", id: "next-btn", onclick: nextPractice },
-          p.i < p.questionIds.length - 1 ? "Volgende →" : "Afronden") : h("span", { class: "muted small" }, "Kies A, B of C.")),
+        answered
+          ? h("button", { class: "btn primary", type: "button", id: "next-btn", onclick: nextPractice },
+            p.i < p.questionIds.length - 1 ? "Volgende →" : "Afronden")
+          : [h("button", { class: "btn primary", type: "button", id: "check-btn", disabled: p.pending === null, onclick: () => answerPractice(p.pending) }, "Controleer"),
+            h("span", { class: "muted small" }, p.pending === null ? "Kies A, B of C." : "Je kunt nog wisselen.")]),
       wctx ? wordHelpPanel(helpTexts, { open: state.settings.wordHelpOpen, onToggle: setHelpOpen }) : null));
 }
 
-function answerPractice(orig) {
+// Step 1: select (or change) an answer; nothing is recorded yet.
+function selectPractice(orig) {
   const p = practice;
   if (!p || p.chosen !== null) return;
+  p.pending = orig;
+  render();
+  const pos = p.optionOrders[p.i].indexOf(orig);
+  const btns = document.querySelectorAll(".option");
+  if (btns[pos]) btns[pos].focus({ preventScroll: true });
+}
+// Step 2: check the selected answer; this records it.
+function answerPractice(orig) {
+  const p = practice;
+  if (!p || p.chosen !== null || orig === null || orig === undefined) return;
   const q = QMAP.get(p.questionIds[p.i]);
   p.chosen = orig;
   p.done++;
@@ -1954,6 +1981,7 @@ function nextPractice() {
   if (!p) return;
   p.i++;
   p.chosen = null;
+  p.pending = null;
   render();
   const qt = document.getElementById("qtext");
   if (qt) qt.focus({ preventScroll: true });
@@ -2187,7 +2215,9 @@ document.addEventListener("keydown", (ev) => {
       if (ex.current < ex.questionIds.length - 1) moveExam(1); else submitFlow();
     }
   } else if (view.name === "practice" && practice && practice.i < practice.questionIds.length) {
-    if (choice !== undefined && practice.chosen === null) { ev.preventDefault(); answerPractice(practice.optionOrders[practice.i][choice]); }
+    if (choice !== undefined && practice.chosen === null) { ev.preventDefault(); selectPractice(practice.optionOrders[practice.i][choice]); }
+    else if (key === "Enter" && practice.chosen === null && practice.pending !== null
+      && !(onButton && !ev.target.classList.contains("option"))) { ev.preventDefault(); answerPractice(practice.pending); }
     else if (key === "Enter" && practice.chosen !== null && !onButton) { ev.preventDefault(); nextPractice(); }
     else if (key === "ArrowRight" && practice.chosen !== null) { ev.preventDefault(); nextPractice(); }
   }

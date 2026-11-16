@@ -257,61 +257,74 @@ input[type="number"], select { font: inherit; min-height: 44px; padding: 6px 10p
 .note { background: var(--deep-soft); border-radius: 10px; padding: 10px 12px; font-size: 0.9rem; }
 .error-text { color: var(--bad); font-weight: 600; }
 
-/* ------------------------------------------------------------- exam screen (sober) */
-.exam-shell { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px 0 24px; }
-.exam-shell.with-panel { grid-template-columns: minmax(0, 1fr) 280px; }
+/* ------------------------------------------------------------- exam + practice screen (sober) */
+/* Layout follows the official online practice test (step row, counter, plain radios);
+   the colours are our own. */
+.exam-shell { padding: 16px 0 24px; }
 .exam-head { position: sticky; top: 0; z-index: 5; background: var(--surface); border-bottom: 1px solid var(--border); }
 .exam-head .wrap { display: flex; align-items: center; gap: 12px; min-height: 60px; flex-wrap: wrap; }
 .exam-head .title { font-weight: 700; }
 .exam-head .spacer { flex: 1; }
+@media (max-width: 420px) { .exam-head .wide-only { display: none; } }
 .timer { font-variant-numeric: tabular-nums; font-weight: 800; font-size: 1.25rem; padding: 6px 12px; border-radius: 10px; border: 2px solid var(--border); background: var(--surface); min-width: 92px; text-align: center; }
 .timer.warn { border-color: var(--warn); color: var(--warn); background: var(--warn-soft); }
 .timer.crit { border-color: var(--bad); color: var(--bad); background: var(--bad-soft); }
-.qpanel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
 .qnum { font-size: 0.9rem; color: var(--muted); font-weight: 600; margin-bottom: 6px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .qtext { font-size: 1.15rem; font-weight: 600; margin: 0 0 18px; }
-.options { display: grid; gap: 10px; margin: 0; padding: 0; border: 0; }
-.option {
-  display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: start;
-  width: 100%; text-align: left; min-height: 56px; padding: 12px 14px; border-radius: 12px;
-  border: 2px solid var(--border); background: var(--surface); color: var(--text); font: inherit; cursor: pointer;
-}
-.option:hover { border-color: var(--deep); }
-.option .letter { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 800; }
-.option[aria-checked="true"] { border-color: var(--deep); background: var(--deep-soft); }
-.option[aria-checked="true"] .letter { background: var(--deep); border-color: var(--deep); color: var(--surface); }
-.option.correct { border-color: var(--ok); background: var(--ok-soft); }
-.option.correct .letter { background: var(--ok); border-color: var(--ok); color: var(--surface); }
-.option.wrong { border-color: var(--bad); background: var(--bad-soft); }
-.option.wrong .letter { background: var(--bad); border-color: var(--bad); color: var(--surface); }
-.option[disabled], .option[aria-disabled="true"] { cursor: default; }
-.option[aria-disabled="true"]:not(.correct):not(.wrong):hover { border-color: var(--border); }
-.exam-nav { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; align-items: center; }
-.exam-nav .spacer { flex: 1; }
-.flag-btn[aria-pressed="true"] { border-color: var(--flag); color: var(--flag); background: var(--warn-soft); }
 
-.overview { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; align-self: start; position: sticky; top: 76px; }
-.overview h2 { font-size: 1rem; }
-.ogrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-.ocell { min-height: 44px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: inherit; font-weight: 700; cursor: pointer; position: relative; }
-.ocell.answered { background: var(--deep-soft); border-color: var(--deep); }
-.ocell.current { outline: 3px solid var(--text); outline-offset: 1px; }
-.ocell.flagged::after { content: ""; position: absolute; top: 3px; right: 3px; width: 0; height: 0; border-left: 9px solid transparent; border-top: 9px solid var(--flag); }
-.olegend { display: grid; gap: 4px; font-size: 0.8rem; color: var(--muted); margin-top: 10px; }
-.olegend span { display: inline-flex; align-items: center; gap: 6px; }
-.olegend i { width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--border); display: inline-block; background: var(--surface-2); }
-.olegend i.a { background: var(--deep-soft); border-color: var(--deep); }
-.olegend i.f { background: linear-gradient(225deg, var(--flag) 0 35%, var(--surface-2) 35%); }
-
-/* mobile: overview becomes a bottom sheet */
-@media (max-width: 860px) {
-  .exam-shell.with-panel { grid-template-columns: minmax(0, 1fr); }
-  .overview { position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 40; border-radius: 16px 16px 0 0; max-height: 70vh; overflow: auto; box-shadow: 0 -8px 30px rgba(0,0,0,0.25); padding-bottom: 24px; }
-  .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 39; }
-  .ogrid { grid-template-columns: repeat(8, 1fr); }
-  .qtext { font-size: 1.05rem; }
+.toets { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 28px 32px 32px; max-width: 840px; margin: 0 auto; }
+.steps { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.steps li { display: block; }
+.steps li.gap { color: var(--muted); padding: 0 2px; }
+.step {
+  width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font: inherit; font-size: 0.95rem;
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
 }
-@media (max-width: 420px) { .ogrid { grid-template-columns: repeat(5, 1fr); } }
+.step:hover { border-color: var(--deep); }
+.step.special { background: var(--surface-2); }
+.step.answered { background: var(--deep-soft); border-color: var(--deep-soft); }
+.step.skipped { background: var(--flag); border-color: var(--flag); color: var(--surface); }
+.step.current { background: var(--accent-soft); border: 2px solid var(--accent); color: var(--text); font-weight: 700; }
+.steps.all { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 12px; }
+.step-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.8rem; color: var(--muted); }
+.step-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.step-legend i { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); display: inline-block; }
+.step-legend i.answered { background: var(--deep-soft); border-color: var(--deep-soft); }
+.step-legend i.skipped { background: var(--flag); border-color: var(--flag); }
+.toets-count { background: var(--accent-soft); border: 1px solid var(--border); color: var(--accent-strong); border-radius: 4px; padding: 10px 14px; font-size: 0.9rem; margin-bottom: 22px; }
+.toets .qtext { font-weight: 400; font-size: 1.12rem; line-height: 1.55; white-space: pre-line; }
+.toets .qno { font-size: 1.6rem; font-weight: 600; line-height: 1; }
+.toets-title { margin: 0 0 10px; font-size: 1.5rem; }
+.toets-title:focus, .toets .qtext:focus { outline: none; }
+.finish-q { font-size: 1.15rem; max-width: 30em; margin: 0 0 16px; }
+.radios { display: grid; gap: 10px; margin: 0; justify-items: start; }
+.radio { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; max-width: 100%; }
+.radio input { width: 20px; height: 20px; margin: 2px 0 0; flex: none; accent-color: var(--deep); cursor: pointer; }
+.radio.locked, .radio.locked input { cursor: default; }
+.radio.locked input { opacity: 0.7; }
+.radio-text { line-height: 1.45; }
+.radio.correct .radio-text { color: var(--ok); font-weight: 600; }
+.radio.wrong .radio-text { color: var(--bad); }
+.radio .mark { font-weight: 800; }
+.toets-nav { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 22px; align-items: center; }
+.btn.square { border-radius: 4px; min-height: 40px; padding: 8px 14px; font-weight: 500; }
+.btn.square.icon { padding: 8px 10px; }
+.btn.go { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+.btn.go:hover { filter: brightness(1.08); border-color: var(--ok); }
+.toets-hint { margin: 8px 0 0; }
+.alert-bad { background: var(--bad-soft); border: 1px solid var(--bad); color: var(--bad); border-radius: 4px; padding: 10px 14px; max-width: 30em; margin-bottom: 4px; }
+.feedback .right-answer { font-weight: 600; }
+@media (max-width: 640px) {
+  .toets { padding: 16px 12px 20px; }
+  .steps { gap: 4px; }
+  .step { width: 36px; height: 36px; font-size: 0.9rem; }
+  .exam-head .wrap { flex-wrap: nowrap; gap: 8px; }
+  .exam-head .timer { min-width: 0; font-size: 1.1rem; padding: 4px 8px; }
+  .toets .qtext { font-size: 1.05rem; }
+  .radio-text { font-size: 1.05rem; }
+  .radio input { width: 22px; height: 22px; margin-top: 1px; }
+}
 
 /* ------------------------------------------------------------- results / review */
 .result-hero { text-align: center; padding: 26px 18px; }
@@ -1013,7 +1026,6 @@ const MATCHER = glossaryMatcher(GLOSSARY);
 const PARAMS = new URLSearchParams(location.search);
 const DEBUG_TIMER_SEC = Number(PARAMS.get("debugTimer")) > 0 ? Number(PARAMS.get("debugTimer")) : null;
 const rng = makeRng((Date.now() ^ Math.floor(Math.random() * 1e9)) >>> 0);
-const LETTERS = ["A", "B", "C"];
 const reducedMotion = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const SUBTOPIC_LABELS = {
@@ -1216,7 +1228,7 @@ function toggleTheme() {
 
 // ===================================================================== routing
 let view = { name: "dashboard" };
-let ui = { panelOpen: window.innerWidth > 860, reviewFilter: "alles", studyCat: "", studyLimit: 25, reviewHelp: new Set(), glQuery: "", glKind: "alles" };
+let ui = { examPage: "q", reviewFilter: "alles", studyCat: "", studyLimit: 25, reviewHelp: new Set(), glQuery: "", glKind: "alles" };
 let timerHandle = null;
 let practice = null; // transient practice session
 let notice = null; // one-off message for the next screen
@@ -1534,12 +1546,13 @@ function renderExamIntro() {
       h("div", { class: "kicker" }, "Oefenexamen"),
       h("h1", null, "Spelregels"),
       h("ul", null,
-        h("li", null, `${EXAM_SIZE} meerkeuzevragen, telkens drie antwoorden (A, B, C).`),
+        h("li", null, `${EXAM_SIZE} meerkeuzevragen, telkens drie antwoorden.`),
         h("li", null, timed ? `${DEBUG_TIMER_SEC ? DEBUG_TIMER_SEC + " seconden (testmodus)" : EXAM_MINUTES + " minuten"}; bij 0:00 wordt automatisch ingeleverd.` : "Zonder tijdsdruk (aan te passen in Instellingen)."),
         h("li", null, `Geslaagd bij ${PASS_MARK} van de ${EXAM_SIZE} goed.`),
-        h("li", null, "Eén vraag per scherm. Met Vorige/Volgende of het overzicht spring je heen en weer; met Markeren zet je een vlag."),
+        h("li", null, "Eén vraag per scherm, net als bij de online oefentoets. Met Vorige/Volgende of de genummerde rondjes spring je heen en weer. Een vraag die je hebt gezien maar nog niet beantwoord, kleurt oranje."),
+        h("li", null, "Inleveren doe je via het vlaggetje achteraan (of Volgende na de laatste vraag)."),
         h("li", null, "Je krijgt pas feedback na het inleveren."),
-        h("li", null, "Toetsenbord: 1/2/3 of A/B/C kiest, ←/→ bladert, F markeert, Enter gaat verder.")),
+        h("li", null, "Toetsenbord: 1/2/3 kiest, ←/→ bladert, Enter gaat naar de volgende vraag.")),
       h("h2", null, "Verdeling over de categorieën"),
       categorySplitList(),
       h("p", { class: "note" }, "De echte verdeling over de categorieën is niet gepubliceerd; dit is een schatting."),
@@ -1554,6 +1567,8 @@ function startExam() {
   if (DEBUG_TIMER_SEC) { exam.timed = true; exam.deadline = now + DEBUG_TIMER_SEC * 1000; }
   exam.warned5 = false;
   exam.warned1 = false;
+  exam.visited = exam.questionIds.map((_, k) => k === 0);
+  ui.examPage = "q";
   commit({ ...state, inProgress: exam });
   go("exam", null, { replace: true });
 }
@@ -1571,7 +1586,7 @@ function renderResume() {
         ex.timed ? ` Resterende tijd: ${formatDuration(left)}.` : " Zonder tijdsdruk."),
       h("p", { class: "muted small" }, "Afbreken gooit dit examen weg; het telt dan nergens mee."),
       h("div", { class: "btn-row" },
-        h("button", { class: "btn primary", type: "button", onclick: () => go("exam", null, { replace: true }) }, "Doorgaan"),
+        h("button", { class: "btn primary", type: "button", onclick: () => { ui.examPage = "q"; go("exam", null, { replace: true }); } }, "Doorgaan"),
         h("button", { class: "btn danger", type: "button", onclick: abandonFlow }, "Afbreken"))));
 }
 
@@ -1582,115 +1597,188 @@ async function abandonFlow() {
   go("dashboard", null, { replace: view.name === "exam" || view.name === "resume" });
 }
 
+// ===================================================================== toets layout (exam + practice)
+// Follows the layout of the official online practice test: a row of round steps
+// (instructions, one per question, hand in), an "answered" counter, plain radio answers
+// and Vorige / overzicht / Volgende. Colours and wording are our own.
+// Positions: -1 = instructions, 0..n-1 = questions, n = hand-in page.
+const NARROW = 640;
+const isNarrow = () => window.innerWidth <= NARROW;
+const FLAG_ICON = `<svg width="18" height="18" viewBox="0 0 24 24"><path d="M5 21V4M5 4h13l-2.5 4L18 12H5" fill="none" style="stroke:currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+const LIST_ICON = `<svg width="18" height="18" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11" style="stroke:currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="4.5" cy="6" r="1.5" style="fill:currentColor"/><circle cx="4.5" cy="12" r="1.5" style="fill:currentColor"/><circle cx="4.5" cy="18" r="1.5" style="fill:currentColor"/></svg>`;
+
+// status(k): "answered" | "skipped" (seen but not answered) | ""
+function stepButton(k, n, pos, status, onGo, finishLabel) {
+  if (k === -1) return h("button", { type: "button", class: "step special" + (pos === -1 ? " current" : ""), "aria-label": "Instructies", "aria-current": pos === -1 ? "step" : null, onclick: () => onGo(-1) }, h("b", { "aria-hidden": "true" }, "i"));
+  if (k === n) return h("button", { type: "button", class: "step special" + (pos === n ? " current" : ""), "aria-label": finishLabel, title: finishLabel, "aria-current": pos === n ? "step" : null, onclick: () => onGo(n) }, svg(FLAG_ICON));
+  const st = status(k);
+  return h("button", {
+    type: "button", class: "step" + (st ? " " + st : "") + (pos === k ? " current" : ""),
+    "aria-label": `Vraag ${k + 1}${st === "answered" ? ", beantwoord" : st === "skipped" ? ", gezien, niet beantwoord" : ""}`,
+    "aria-current": pos === k ? "step" : null, onclick: () => onGo(k),
+  }, String(k + 1));
+}
+function stepper(n, pos, status, onGo, finishLabel) {
+  // On a phone only a window around the current question is shown (plus the last one);
+  // the list button opens all of them.
+  let ks = [...Array(n).keys()];
+  if (isNarrow() && n > 7) {
+    const c = Math.min(Math.max(pos, 0), n - 1);
+    const start = Math.min(Math.max(c - 1, 0), n - 3);
+    ks = [...Array(3).keys()].map((x) => start + x);
+    if (!ks.includes(n - 1)) ks.push(n - 1);
+  }
+  const items = [h("li", null, stepButton(-1, n, pos, status, onGo, finishLabel))];
+  ks.forEach((k, j) => {
+    if (j > 0 && k !== ks[j - 1] + 1) items.push(h("li", { class: "gap", "aria-hidden": "true" }, "…"));
+    items.push(h("li", null, stepButton(k, n, pos, status, onGo, finishLabel)));
+  });
+  items.push(h("li", null, stepButton(n, n, pos, status, onGo, finishLabel)));
+  return h("nav", { "aria-label": "Vragen" }, h("ol", { class: "steps" }, items));
+}
+function openStepList(n, pos, status, onGo, finishLabel) {
+  const pick = (k) => {
+    const dlg = document.querySelector("dialog[open]");
+    if (dlg) dlg.dispatchEvent(new Event("cancel", { cancelable: true }));
+    onGo(k);
+  };
+  const all = [-1, ...Array(n).keys(), n].map((k) => stepButton(k, n, pos, status, pick, finishLabel));
+  dialog({
+    title: "Vragen",
+    body: [h("div", { class: "steps all" }, all),
+      h("div", { class: "step-legend" },
+        h("span", null, h("i", { class: "answered" }), "beantwoord"),
+        h("span", null, h("i", { class: "skipped" }), "gezien, niet beantwoord"),
+        h("span", null, h("i"), "nog niet gezien"))],
+    actions: [{ label: "Sluiten", value: null, cls: "" }],
+  });
+}
+function radioAnswers(q, order, ctx, { chosen, locked, onPick, marks }) {
+  return h("div", { class: "radios", role: "radiogroup", "aria-labelledby": "qtext" },
+    order.map((orig) => {
+      const mark = marks ? marks(orig) : "";
+      // Locked answers are not `disabled`: WebKit (iPhone) then swallows taps on everything inside
+      // the label, including the underlined words. Instead, clicks are cancelled and any change is undone.
+      return h("label", { class: "radio" + (mark ? " " + mark : "") + (locked ? " locked" : "") },
+        h("input", {
+          type: "radio", name: "antwoord", value: String(orig), checked: chosen === orig, "aria-disabled": locked ? "true" : null,
+          onclick: locked ? (ev) => ev.preventDefault() : null,
+          onchange: () => (locked ? render() : onPick(orig)),
+        }),
+        h("span", { class: "radio-text" }, rich(q.options[orig], ctx),
+          mark === "correct" ? h("span", { class: "mark" }, " ✓", h("span", { class: "sr-only" }, " juist antwoord")) : null,
+          mark === "wrong" ? h("span", { class: "mark" }, " ✗", h("span", { class: "sr-only" }, " jouw antwoord, fout")) : null));
+    }));
+}
+function questionText(i, n, q, ctx) {
+  return h("p", { class: "qtext", id: "qtext", tabindex: "-1" },
+    h("span", { class: "qno", "aria-hidden": "true" }, `${i + 1}.`), h("span", { class: "sr-only" }, `Vraag ${i + 1} van ${n}: `), " ",
+    rich(q.question, ctx));
+}
+function toetsNav({ pos, n, onMove, onList, middle, nextPrimary = true }) {
+  return h("div", { class: "toets-nav" },
+    h("button", { class: "btn square", type: "button", disabled: pos <= -1, onclick: () => onMove(-1) }, "Vorige"),
+    h("button", { class: "btn square icon", type: "button", "aria-label": "Alle vragen", title: "Alle vragen", onclick: onList }, svg(LIST_ICON)),
+    middle || null,
+    pos < n ? h("button", { class: "btn square" + (nextPrimary ? " primary" : ""), type: "button", id: "next-btn", onclick: () => onMove(1) }, "Volgende") : null);
+}
+function focusToets() {
+  const t = document.getElementById("qtext") || document.getElementById("toets-title");
+  if (t) t.focus({ preventScroll: true });
+}
+
 // ===================================================================== exam: question screen
+const examPos = (ex) => (ui.examPage === "info" ? -1 : ui.examPage === "finish" ? ex.questionIds.length : Math.min(Math.max(ex.current || 0, 0), ex.questionIds.length - 1));
+const examVisited = (ex) => ex.visited || ex.answers.map((a) => a !== null);
+function examStatus(ex) {
+  const seen = examVisited(ex);
+  return (k) => (ex.answers[k] !== null ? "answered" : seen[k] ? "skipped" : "");
+}
+
 function renderExam() {
   const ex = state.inProgress;
   if (!ex) return renderDashboard();
   document.body.classList.add("exam-mode");
-  const i = Math.min(Math.max(ex.current || 0, 0), ex.questionIds.length - 1);
-  const q = QMAP.get(ex.questionIds[i]);
-  const order = ex.optionOrders[i];
-  const chosen = ex.answers[i];
-  const flagged = ex.flags[i];
+  const n = ex.questionIds.length;
+  const pos = examPos(ex);
   const answeredCount = ex.answers.filter((a) => a !== null).length;
+  const status = examStatus(ex);
 
   const head = h("header", { class: "exam-head" }, h("div", { class: "wrap" },
-    h("span", { class: "title" }, "Oefenexamen Zwem-ABC"),
-    h("span", { class: "muted small" }, `${answeredCount}/${ex.questionIds.length} beantwoord`),
+    h("span", { class: "title" }, "Oefenexamen", h("span", { class: "wide-only" }, " Zwem-ABC")),
     h("span", { class: "spacer" }),
-    h("button", { class: "btn small", type: "button", "aria-expanded": String(ui.panelOpen), "aria-controls": "overview", onclick: () => { ui.panelOpen = !ui.panelOpen; render(); } }, "Overzicht"),
+    h("button", { class: "btn small ghost", type: "button", onclick: abandonFlow }, "Afbreken"),
     h("div", { class: "timer", id: "timer", role: "timer", "aria-label": "Resterende tijd" }, ex.timed ? formatDuration(timeLeftMs(ex)) : "—")));
 
-  const wctx = wordHelpOn("exam") ? termCtx() : null;
-  const stem = rich(q.question, wctx);
-  const options = h("div", { class: "options", role: "radiogroup", "aria-labelledby": "qtext" },
-    order.map((orig, pos) => h("button", {
-      class: "option", type: "button", role: "radio", "aria-checked": String(chosen === orig),
-      onclick: () => selectExamAnswer(orig),
-    }, h("span", { class: "letter" }, LETTERS[pos]), h("span", null, rich(q.options[orig], wctx)))));
-
-  const panel = h("section", { class: "qpanel", "aria-labelledby": "qnum" },
-    h("div", { class: "qnum", id: "qnum" }, `Vraag ${i + 1} van ${ex.questionIds.length}`,
-      flagged ? h("span", { class: "pill warn" }, "Gemarkeerd") : null),
-    h("p", { class: "qtext", id: "qtext", tabindex: "-1" }, stem),
-    options,
-    h("div", { class: "exam-nav" },
-      h("button", { class: "btn", type: "button", onclick: () => moveExam(-1), disabled: i === 0 }, "← Vorige"),
-      h("button", { class: "btn flag-btn", type: "button", "aria-pressed": String(flagged), onclick: toggleFlag }, flagged ? "Markering weg" : "Markeren"),
-      i < ex.questionIds.length - 1
-        ? h("button", { class: "btn primary", type: "button", onclick: () => moveExam(1) }, "Volgende →")
-        : h("button", { class: "btn primary", type: "button", onclick: submitFlow }, "Inleveren"),
-      h("span", { class: "spacer" }),
-      i < ex.questionIds.length - 1 ? h("button", { class: "btn", type: "button", onclick: submitFlow }, "Inleveren") : null),
-    wctx ? wordHelpPanel([q.question, ...order.map((o) => q.options[o])], { open: state.settings.wordHelpOpen, onToggle: setHelpOpen, inExam: true }) : null);
-
-  const shell = h("div", { class: "exam-shell" + (ui.panelOpen ? " with-panel" : "") }, panel);
-  const out = [head, h("main", null, h("div", { class: "wrap" }, shell))];
-  if (ui.panelOpen) {
-    const small = window.innerWidth <= 860;
-    const ov = h("aside", { class: "overview", id: "overview", "aria-label": "Overzicht van de vragen" },
-      h("div", { style: "display:flex;align-items:center;gap:8px" }, h("h2", { style: "flex:1" }, "Overzicht"),
-        small ? h("button", { class: "btn small", type: "button", onclick: () => { ui.panelOpen = false; render(); } }, "Sluiten") : null),
-      h("div", { class: "ogrid" }, ex.questionIds.map((_, k) => h("button", {
-        type: "button",
-        class: "ocell" + (ex.answers[k] !== null ? " answered" : "") + (ex.flags[k] ? " flagged" : "") + (k === i ? " current" : ""),
-        "aria-label": `Vraag ${k + 1}${ex.answers[k] !== null ? ", beantwoord" : ", niet beantwoord"}${ex.flags[k] ? ", gemarkeerd" : ""}`,
-        "aria-current": k === i ? "true" : null,
-        onclick: () => { ex.current = k; commit({ ...state }); if (small) ui.panelOpen = false; render(); },
-      }, String(k + 1)))),
-      h("div", { class: "olegend" },
-        h("span", null, h("i", { class: "a" }), "beantwoord"),
-        h("span", null, h("i"), "niet beantwoord"),
-        h("span", null, h("i", { class: "f" }), "gemarkeerd")),
-      h("div", { class: "btn-row", style: "margin-top:12px" },
-        h("button", { class: "btn small primary", type: "button", onclick: submitFlow }, "Inleveren"),
-        h("button", { class: "btn small danger", type: "button", onclick: abandonFlow }, "Afbreken")));
-    if (small) out.push(h("div", { class: "sheet-backdrop", onclick: () => { ui.panelOpen = false; render(); } }), ov);
-    else shell.append(ov);
+  const body = [];
+  let wctx = null;
+  let helpTexts = null;
+  if (pos === -1) {
+    const timed = ex.timed;
+    body.push(h("h2", { class: "toets-title", id: "toets-title", tabindex: "-1" }, "Instructies"),
+      h("p", null, `Het oefenexamen bestaat uit ${n} vragen.`),
+      h("p", null, "Alle vragen zijn meerkeuzevragen. Per vraag is steeds maar één antwoord goed."),
+      h("p", null, timed ? `Je hebt ${EXAM_MINUTES} minuten. Bij 0:00 wordt automatisch ingeleverd.` : "Je hebt geen tijdslimiet (aan te passen in Instellingen)."),
+      h("p", null, "Je ziet pas na het inleveren welke antwoorden goed waren."),
+      h("div", { class: "toets-nav" }, h("button", { class: "btn square primary", type: "button", id: "next-btn", onclick: () => moveExam(1) }, "Volgende")));
+  } else if (pos === n) {
+    const open = n - answeredCount;
+    body.push(h("p", { class: "finish-q", id: "toets-title", tabindex: "-1" }, "Weet je zeker dat je wilt inleveren? Daarna kun je je antwoorden niet meer aanpassen."),
+      open ? h("div", { class: "alert-bad", role: "status" }, h("b", null, "Let op: "), `je hebt niet alle vragen beantwoord (${open} ${open === 1 ? "vraag" : "vragen"} open). Onbeantwoorde vragen tellen als fout.`) : null,
+      h("div", { class: "toets-nav" },
+        h("button", { class: "btn square go", type: "button", id: "submit-btn", onclick: () => { if (state.inProgress) finishExam(false); } }, "Toets inleveren")));
+  } else {
+    const q = QMAP.get(ex.questionIds[pos]);
+    const order = ex.optionOrders[pos];
+    wctx = wordHelpOn("exam") ? termCtx() : null;
+    const stem = questionText(pos, n, q, wctx);
+    body.push(stem,
+      radioAnswers(q, order, wctx, { chosen: ex.answers[pos], locked: false, onPick: selectExamAnswer }),
+      toetsNav({ pos, n, onMove: moveExam, onList: () => openStepList(n, pos, status, examGo, "Inleveren") }));
+    helpTexts = [q.question, ...order.map((o) => q.options[o])];
   }
-  return out;
+
+  const card = h("section", { class: "toets", "aria-label": "Oefenexamen" },
+    stepper(n, pos, status, examGo, "Inleveren"),
+    h("div", { class: "toets-count", role: "status" }, `Vragen beantwoord: ${answeredCount} / ${n}`),
+    body,
+    wctx ? wordHelpPanel(helpTexts, { open: state.settings.wordHelpOpen, onToggle: setHelpOpen, inExam: true }) : null);
+  return [head, h("main", null, h("div", { class: "wrap" }, h("div", { class: "exam-shell" }, card)))];
 }
 
 function selectExamAnswer(orig) {
   const ex = state.inProgress;
-  if (!ex) return;
+  if (!ex || ui.examPage !== "q") return;
   ex.answers[ex.current] = orig;
   commit({ ...state });
   render();
-  const btns = document.querySelectorAll(".option");
   const pos = ex.optionOrders[ex.current].indexOf(orig);
-  if (btns[pos]) btns[pos].focus({ preventScroll: true });
+  const inputs = document.querySelectorAll(".radio input");
+  if (inputs[pos]) inputs[pos].focus({ preventScroll: true });
+}
+function examGo(k) {
+  const ex = state.inProgress;
+  if (!ex) return;
+  const n = ex.questionIds.length;
+  if (k <= -1) ui.examPage = "info";
+  else if (k >= n) ui.examPage = "finish";
+  else {
+    ui.examPage = "q";
+    ex.current = k;
+    ex.visited = examVisited(ex).slice();
+    ex.visited[k] = true;
+    commit({ ...state });
+  }
+  render();
+  focusToets();
 }
 function moveExam(d) {
   const ex = state.inProgress;
   if (!ex) return;
-  const n = Math.min(Math.max(ex.current + d, 0), ex.questionIds.length - 1);
-  if (n === ex.current) return;
-  ex.current = n;
-  commit({ ...state });
-  render();
-  const qt = document.getElementById("qtext");
-  if (qt) qt.focus({ preventScroll: true });
-}
-function toggleFlag() {
-  const ex = state.inProgress;
-  if (!ex) return;
-  ex.flags[ex.current] = !ex.flags[ex.current];
-  commit({ ...state });
-  render();
-}
-async function submitFlow() {
-  const ex = state.inProgress;
-  if (!ex) return;
-  const unanswered = ex.answers.filter((a) => a === null).length;
-  const flagged = ex.flags.filter(Boolean).length;
-  const body = [
-    h("p", null, unanswered ? `Je hebt ${unanswered} ${unanswered === 1 ? "vraag" : "vragen"} niet beantwoord.` : "Je hebt alle vragen beantwoord."),
-    h("p", null, flagged ? `${flagged} ${flagged === 1 ? "vraag is" : "vragen zijn"} gemarkeerd.` : "Er zijn geen gemarkeerde vragen."),
-    unanswered ? h("p", { class: "muted small" }, "Onbeantwoorde vragen tellen als fout.") : null,
-  ];
-  const ok = await confirmDialog("Examen inleveren?", body, "Inleveren", false);
-  if (ok && state.inProgress) finishExam(false);
+  const n = ex.questionIds.length;
+  const from = examPos(ex);
+  const to = Math.min(Math.max(from + d, -1), n);
+  if (to !== from) examGo(to);
 }
 function finishExam(auto) {
   commit(submitExam(BANK, state, Date.now(), auto));
@@ -1795,7 +1883,7 @@ function renderReview() {
     ["fout", "Fout", rows.filter((r) => status(r) === "wrong").length],
     ["gemarkeerd", "Gemarkeerd", rows.filter((r) => r.flag).length],
     ["leeg", "Niet beantwoord", rows.filter((r) => status(r) === "blank").length],
-  ];
+  ].filter(([key, , cnt]) => key !== "gemarkeerd" || cnt > 0); // marking was removed; older exams may still have marks
   const f = ui.reviewFilter;
   const shown = rows.filter((r) => f === "alles" || (f === "fout" && status(r) === "wrong") || (f === "gemarkeerd" && r.flag) || (f === "leeg" && status(r) === "blank"));
   return page(
@@ -1818,7 +1906,7 @@ function renderReview() {
         h("p", { class: "qtext", style: "margin-bottom:6px" }, stem),
         h("ul", { class: "review-opts" }, r.order.map((orig, pos) => h("li", {
           class: orig === r.q.answer ? "correct" : orig === r.a ? "chosen-wrong" : "",
-        }, h("b", null, LETTERS[pos]), h("span", null, opts[pos],
+        }, h("b", { "aria-hidden": "true" }, orig === r.q.answer ? "✓" : orig === r.a ? "✗" : "○"), h("span", null, opts[pos],
           orig === r.q.answer ? h("span", { class: "sr-only" }, " (juist antwoord)") : null,
           orig === r.a ? h("em", { class: "small muted" }, orig === r.q.answer ? " — jouw antwoord" : " — jouw antwoord") : null)))),
         h("p", null, expl),
@@ -1887,14 +1975,18 @@ async function startPractice(scope, n, label) {
     await infoDialog("Geen vragen gevonden", scope.kind === "wrong" ? "Je hebt (nog) niets fout beantwoord. Lekker bezig." : "In deze selectie zitten (nu) geen vragen.");
     return;
   }
-  practice = { ...set, label, i: 0, chosen: null, pending: null, correct: 0, done: 0 };
+  const blank = () => set.questionIds.map(() => null);
+  practice = { ...set, label, i: 0, page: "q", chosen: blank(), pending: blank(), visited: set.questionIds.map((_, k) => k === 0), correct: 0, done: 0, finished: false };
   go("practice");
 }
+
+const practicePos = (p) => (p.page === "info" ? -1 : p.page === "finish" ? p.questionIds.length : p.i);
+const practiceStatus = (p) => (k) => (p.chosen[k] !== null ? "answered" : p.visited[k] ? "skipped" : "");
 
 function renderPractice() {
   if (!practice) return renderPracticeSetup();
   const p = practice;
-  if (p.i >= p.questionIds.length) {
+  if (p.finished) {
     const score = p.correct;
     const total = p.done;
     const ratio = total ? score / total : 0;
@@ -1908,83 +2000,103 @@ function renderPractice() {
         h("button", { class: "btn", type: "button", onclick: () => go("progress") }, "Bekijk voortgang"),
         h("button", { class: "btn ghost", type: "button", onclick: () => go("dashboard") }, "Naar overzicht"))));
   }
-  const q = QMAP.get(p.questionIds[p.i]);
-  const order = p.optionOrders[p.i];
-  const answered = p.chosen !== null;
-  const isRight = answered && p.chosen === q.answer;
-  const correctPos = order.indexOf(q.answer);
-  const wctx = wordHelpOn("practice") ? termCtx() : null;
-  const stem = rich(q.question, wctx);
-  const optionNodes = order.map((orig) => rich(q.options[orig], wctx));
-  const explanation = answered ? rich(q.explanation, wctx) : null;
-  const helpTexts = [q.question, ...order.map((o) => q.options[o]), ...(answered ? [q.explanation] : [])];
-  return page(
-    h("div", { class: "btn-row", style: "margin-bottom:10px" },
-      h("span", { class: "kicker" }, `Oefenen · ${p.label}`),
-      h("span", { class: "spacer", style: "flex:1" }),
-      h("span", { class: "muted small" }, `${p.correct} van ${p.done} goed`),
-      h("button", { class: "btn small ghost", type: "button", onclick: () => { p.questionIds = p.questionIds.slice(0, p.i); render(); } }, "Stoppen")),
-    h("section", { class: "qpanel" },
-      h("div", { class: "qnum" }, `Vraag ${p.i + 1} van ${p.questionIds.length}`, h("span", { class: "pill" }, categoryLabel(q.category))),
-      h("p", { class: "qtext", id: "qtext", tabindex: "-1" }, stem),
-      // Two steps: tapping an answer only selects it (changeable), "Controleer" checks it.
-      // After checking, the answers are aria-disabled rather than disabled, so the
-      // underlined words inside them stay tappable.
-      h("div", { class: "options", role: answered ? "group" : "radiogroup", "aria-labelledby": "qtext" },
-        order.map((orig, pos) => h("button", {
-          class: "option" + (answered && orig === q.answer ? " correct" : "") + (answered && orig === p.chosen && orig !== q.answer ? " wrong" : ""),
-          type: "button", role: answered ? null : "radio", "aria-checked": answered ? null : String(p.pending === orig),
-          "aria-disabled": answered ? "true" : null,
-          onclick: () => selectPractice(orig),
-        }, h("span", { class: "letter" }, LETTERS[pos]), h("span", null, optionNodes[pos])))),
+  const n = p.questionIds.length;
+  const pos = practicePos(p);
+  const status = practiceStatus(p);
+  const body = [];
+  let wctx = null;
+  let helpTexts = null;
+  if (pos === -1) {
+    body.push(h("h2", { class: "toets-title", id: "toets-title", tabindex: "-1" }, "Instructies"),
+      h("p", null, `Deze oefenronde bestaat uit ${n} ${n === 1 ? "vraag" : "vragen"}.`),
+      h("p", null, "Alle vragen zijn meerkeuzevragen. Per vraag is steeds maar één antwoord goed."),
+      h("p", null, "Kies een antwoord en druk op Controleer. Je ziet dan meteen of het klopt, met uitleg en bron. Tot je op Controleer drukt, kun je nog wisselen."),
+      h("div", { class: "toets-nav" }, h("button", { class: "btn square primary", type: "button", id: "next-btn", onclick: () => movePractice(1) }, "Volgende")));
+  } else if (pos === n) {
+    const open = n - p.done;
+    body.push(h("p", { class: "finish-q", id: "toets-title", tabindex: "-1" }, `Klaar met oefenen? Je hebt ${p.done} van de ${n} vragen gecontroleerd en ${p.correct} goed.`),
+      open ? h("div", { class: "alert-bad", role: "status" }, h("b", null, "Let op: "), `${open} ${open === 1 ? "vraag heb" : "vragen heb"} je nog niet gecontroleerd. Die tellen niet mee.`) : null,
+      h("div", { class: "toets-nav" },
+        h("button", { class: "btn square", type: "button", onclick: () => movePractice(-1) }, "Vorige"),
+        h("button", { class: "btn square go", type: "button", id: "finish-btn", onclick: () => { p.finished = true; render(); window.scrollTo(0, 0); } }, "Ronde afronden")));
+  } else {
+    const q = QMAP.get(p.questionIds[pos]);
+    const order = p.optionOrders[pos];
+    const chosen = p.chosen[pos];
+    const answered = chosen !== null;
+    const isRight = answered && chosen === q.answer;
+    wctx = wordHelpOn("practice") ? termCtx() : null;
+    const stem = questionText(pos, n, q, wctx);
+    // Two steps: choosing an answer only selects it (changeable); "Controleer" checks it.
+    // After checking, the radios are disabled; the underlined words inside them stay tappable.
+    const answers = radioAnswers(q, order, wctx, {
+      chosen: answered ? chosen : p.pending[pos], locked: answered, onPick: selectPractice,
+      marks: answered ? (orig) => (orig === q.answer ? "correct" : orig === chosen ? "wrong" : "") : null,
+    });
+    const explanation = answered ? rich(q.explanation, wctx) : null;
+    body.push(stem, answers,
       answered ? h("div", { class: "feedback " + (isRight ? "ok" : "bad") },
-        h("div", { class: "verdict" }, isRight ? "Goed!" : `Helaas. Het juiste antwoord is ${LETTERS[correctPos]}.`),
+        h("div", { class: "verdict" }, isRight ? "Goed!" : "Helaas. Het juiste antwoord is:", isRight ? null : h("span", { class: "right-answer" }, " ", q.options[q.answer])),
         h("p", null, explanation),
         h("div", { class: "ref" }, q.ref),
         sourceBlock(q)) : null,
-      h("div", { class: "exam-nav" },
-        answered
-          ? h("button", { class: "btn primary", type: "button", id: "next-btn", onclick: nextPractice },
-            p.i < p.questionIds.length - 1 ? "Volgende →" : "Afronden")
-          : [h("button", { class: "btn primary", type: "button", id: "check-btn", disabled: p.pending === null, onclick: () => answerPractice(p.pending) }, "Controleer"),
-            h("span", { class: "muted small" }, p.pending === null ? "Kies A, B of C." : "Je kunt nog wisselen.")]),
+      toetsNav({
+        pos, n, onMove: movePractice, onList: () => openStepList(n, pos, status, practiceGo, "Afronden"), nextPrimary: answered,
+        middle: answered ? null : h("button", { class: "btn square primary", type: "button", id: "check-btn", disabled: p.pending[pos] === null, onclick: () => answerPractice(p.pending[pos]) }, "Controleer"),
+      }),
+      answered ? null : h("p", { class: "muted small toets-hint" }, p.pending[pos] === null ? "Kies een antwoord en druk op Controleer." : "Je kunt nog wisselen."));
+    helpTexts = [q.question, ...order.map((o) => q.options[o]), ...(answered ? [q.explanation] : [])];
+  }
+  return page(
+    h("div", { class: "kicker", style: "margin-bottom:10px" }, `Oefenen · ${p.label}`),
+    h("section", { class: "toets", "aria-label": "Oefenronde" },
+      stepper(n, pos, status, practiceGo, "Afronden"),
+      h("div", { class: "toets-count", role: "status" }, `Vragen beantwoord: ${p.done} / ${n}`, p.done ? ` · ${p.correct} goed` : ""),
+      body,
       wctx ? wordHelpPanel(helpTexts, { open: state.settings.wordHelpOpen, onToggle: setHelpOpen }) : null));
 }
 
+function practiceGo(k) {
+  const p = practice;
+  if (!p) return;
+  const n = p.questionIds.length;
+  if (k <= -1) p.page = "info";
+  else if (k >= n) p.page = "finish";
+  else { p.page = "q"; p.i = k; p.visited[k] = true; }
+  render();
+  focusToets();
+}
+function movePractice(d) {
+  const p = practice;
+  if (!p || p.finished) return;
+  const from = practicePos(p);
+  const to = Math.min(Math.max(from + d, -1), p.questionIds.length);
+  if (to !== from) practiceGo(to);
+}
 // Step 1: select (or change) an answer; nothing is recorded yet.
 function selectPractice(orig) {
   const p = practice;
-  if (!p || p.chosen !== null) return;
-  p.pending = orig;
+  if (!p || p.page !== "q" || p.chosen[p.i] !== null) return;
+  p.pending[p.i] = orig;
   render();
   const pos = p.optionOrders[p.i].indexOf(orig);
-  const btns = document.querySelectorAll(".option");
-  if (btns[pos]) btns[pos].focus({ preventScroll: true });
+  const inputs = document.querySelectorAll(".radio input");
+  if (inputs[pos]) inputs[pos].focus({ preventScroll: true });
 }
 // Step 2: check the selected answer; this records it.
 function answerPractice(orig) {
   const p = practice;
-  if (!p || p.chosen !== null || orig === null || orig === undefined) return;
+  if (!p || p.page !== "q" || p.chosen[p.i] !== null || orig === null || orig === undefined) return;
   const q = QMAP.get(p.questionIds[p.i]);
-  p.chosen = orig;
+  p.chosen[p.i] = orig;
   p.done++;
   const right = orig === q.answer;
   if (right) p.correct++;
   commit(recordPractice(state, q.id, right));
   render();
-  announce(right ? "Goed!" : `Helaas, het juiste antwoord is ${LETTERS[p.optionOrders[p.i].indexOf(q.answer)]}.`);
+  announce(right ? "Goed!" : `Helaas, het juiste antwoord is: ${q.options[q.answer]}`);
   const nb = document.getElementById("next-btn");
   if (nb) nb.focus({ preventScroll: true });
-}
-function nextPractice() {
-  const p = practice;
-  if (!p) return;
-  p.i++;
-  p.chosen = null;
-  p.pending = null;
-  render();
-  const qt = document.getElementById("qtext");
-  if (qt) qt.focus({ preventScroll: true });
 }
 
 // ===================================================================== progress (coverage)
@@ -2200,33 +2312,38 @@ document.addEventListener("keydown", (ev) => {
   if (ev.key === "Escape" && termPop) { ev.preventDefault(); closeTermPop(); return; }
   if (document.querySelector("dialog[open]")) return;
   const tag = (ev.target && ev.target.tagName) || "";
-  if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+  // A focused answer radio still gets the shortcuts (←/→ page instead of moving the selection).
+  const onRadio = tag === "INPUT" && ev.target.type === "radio";
+  if ((tag === "INPUT" && !onRadio) || tag === "SELECT" || tag === "TEXTAREA") return;
   const key = ev.key.length === 1 ? ev.key.toLowerCase() : ev.key;
-  const choice = { 1: 0, 2: 1, 3: 2, a: 0, b: 1, c: 2 }[key];
+  const choice = { 1: 0, 2: 1, 3: 2 }[key];
   const onButton = tag === "BUTTON" || tag === "A" || tag === "LABEL" || tag === "SUMMARY";
   if (view.name === "exam" && state.inProgress) {
     const ex = state.inProgress;
-    if (choice !== undefined) { ev.preventDefault(); selectExamAnswer(ex.optionOrders[ex.current][choice]); }
+    const onQuestion = ui.examPage === "q";
+    if (choice !== undefined && onQuestion) { ev.preventDefault(); selectExamAnswer(ex.optionOrders[ex.current][choice]); }
     else if (key === "ArrowRight") { ev.preventDefault(); moveExam(1); }
     else if (key === "ArrowLeft") { ev.preventDefault(); moveExam(-1); }
-    else if (key === "f") { ev.preventDefault(); toggleFlag(); }
-    else if (key === "Enter" && !(onButton && !ev.target.classList.contains("option"))) {
-      ev.preventDefault();
-      if (ex.current < ex.questionIds.length - 1) moveExam(1); else submitFlow();
+    else if (key === "Enter" && onQuestion && !onButton) { ev.preventDefault(); moveExam(1); }
+  } else if (view.name === "practice" && practice && !practice.finished) {
+    const p = practice;
+    const onQuestion = p.page === "q";
+    const checked = onQuestion && p.chosen[p.i] !== null;
+    if (choice !== undefined && onQuestion && !checked) { ev.preventDefault(); selectPractice(p.optionOrders[p.i][choice]); }
+    else if (key === "ArrowRight") { ev.preventDefault(); movePractice(1); }
+    else if (key === "ArrowLeft") { ev.preventDefault(); movePractice(-1); }
+    else if (key === "Enter" && onQuestion && !onButton) {
+      if (!checked && p.pending[p.i] !== null) { ev.preventDefault(); answerPractice(p.pending[p.i]); }
+      else if (checked) { ev.preventDefault(); movePractice(1); }
     }
-  } else if (view.name === "practice" && practice && practice.i < practice.questionIds.length) {
-    if (choice !== undefined && practice.chosen === null) { ev.preventDefault(); selectPractice(practice.optionOrders[practice.i][choice]); }
-    else if (key === "Enter" && practice.chosen === null && practice.pending !== null
-      && !(onButton && !ev.target.classList.contains("option"))) { ev.preventDefault(); answerPractice(practice.pending); }
-    else if (key === "Enter" && practice.chosen !== null && !onButton) { ev.preventDefault(); nextPractice(); }
-    else if (key === "ArrowRight" && practice.chosen !== null) { ev.preventDefault(); nextPractice(); }
   }
 });
 
+// The question row shows fewer steps on a phone; re-render when crossing that width.
 window.addEventListener("resize", () => {
-  if (view.name !== "exam") return;
-  const small = window.innerWidth <= 860;
-  if (small !== ui.lastSmall) { ui.lastSmall = small; ui.panelOpen = !small; render(); }
+  if (view.name !== "exam" && view.name !== "practice") return;
+  const small = isNarrow();
+  if (small !== ui.lastSmall) { ui.lastSmall = small; render(); }
 });
 if (window.matchMedia) {
   const mq = window.matchMedia("(prefers-color-scheme: dark)");
@@ -2238,7 +2355,7 @@ if (window.matchMedia) {
 function boot() {
   applyTheme();
   renderBanner();
-  ui.lastSmall = window.innerWidth <= 860;
+  ui.lastSmall = isNarrow();
   const ex = state.inProgress;
   if (ex) {
     const unknown = ex.questionIds.some((id) => !QMAP.has(id));
